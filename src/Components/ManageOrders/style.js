@@ -1,6 +1,10 @@
 import { makeStyles} from "@mui/styles";
 
 const useStyles=makeStyles((theme)=>({
+    stepperColors: {
+        "& .Mui-active .MuiStepIcon-root": { color: "red" },
+        "& .Mui-completed .MuiStepIcon-root": { color: "green" },
+      },
     userBox:{
         display:"flex",
         gap:"20px",

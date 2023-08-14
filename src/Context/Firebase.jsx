@@ -27,7 +27,6 @@ import {
   deleteUser,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCIAb_0CjK5iJ4p_9WgU97nBOkSnoTdEUA",
@@ -75,7 +74,6 @@ export const FirebaseProvider = (props) => {
         mobile,
         DOB: "NA",
         email: firebaseAuth.currentUser.email,
-        profilePicURL: "users/profilePic/fakeUser.png",
         role,
         address: "NA",
       });
@@ -97,27 +95,6 @@ export const FirebaseProvider = (props) => {
     return signOut(firebaseAuth)
       .then(() => {})
       .catch((error) => {});
-  };
-
-  const updateProfilePic = async(profilePic) => {
-    const imagesRef = ref(
-      storage,
-      `users/profilePic/${userDisplayName}image.jpg`
-    );
-    uploadBytes(imagesRef, profilePic)
-      .then((result) => {
-        getDownloadURL(ref(storage, result.ref.fullPath)).then((url) => {
-          updateProfile(firebaseAuth.currentUser, {
-            photoURL: url,
-          }).then(()=>{});
-        });
-
-        const docRef = doc(db, "users", firebaseAuth?.currentUser?.uid);
-        updateDoc(docRef, { profilePicPath: result.ref.fullPath })
-          .then(() => {})
-          .catch(() => console.log("no"));
-      })
-      .catch((err) => console.log(err));
   };
 
   const updateProfileInfo = async (
@@ -275,7 +252,6 @@ export const FirebaseProvider = (props) => {
         signupUser,
         signinUser,
         logOut,
-        updateProfilePic,
         usersInformation,
         getImage,
         updateProfileInfo,
@@ -288,6 +264,7 @@ export const FirebaseProvider = (props) => {
         removeElementOfArray,
         passwordReset,
         db,
+        storage,
         firebaseAuth,
         product,
         userAccountInfo,

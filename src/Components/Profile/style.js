@@ -14,6 +14,8 @@ const useStyle = makeStyles((theme) => ({
     aspectRatio: 1,
     borderRadius: "50%",
     overflow: "hidden",
+    border:"1px solid #eeeded"
+
   },
   profileStack: {
     flexDirection: "row !important",
@@ -33,6 +35,12 @@ const useStyle = makeStyles((theme) => ({
       justifyContent: "space-between",
     },
   },
+  menu: {
+    "& .MuiPaper-root": {
+      backgroundColor: "#eeeded"
+    }
+  }
+  
 }));
 
 export default useStyle;

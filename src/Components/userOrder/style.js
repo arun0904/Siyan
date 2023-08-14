@@ -1,6 +1,10 @@
 import { makeStyles } from "@mui/styles";
 
  const useStyles=makeStyles((theme)=>({
+    stepperColors: {
+        "& .Mui-active .MuiStepIcon-root": { color: "red" },
+        "& .Mui-completed .MuiStepIcon-root": { color: "green" },
+      },
     orderBox:{
         border:"1px solid #eeeded",
         borderRadius:"8px",
@@ -51,7 +55,6 @@ import { makeStyles } from "@mui/styles";
         color:"#f50e31",
         textDecoration:"underline"
     }
-
 }))
 
 export default useStyles;

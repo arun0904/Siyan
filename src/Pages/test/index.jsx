@@ -1,5 +1,10 @@
 import React from "react";
-import { getAuth, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useFirebase } from "../../Context/Firebase";
 import { Box, Button } from "@mui/material";
@@ -39,24 +44,18 @@ export default function Test() {
   const addData = async () => {
     console.log("hi");
     const docRef = doc(firebase.db, "products", "0ihjUpLyHkrjrHmIJQsQ");
-    await updateDoc(docRef, {"size.m":[]})
+    await updateDoc(docRef, { "size.m": [] })
       .then(() => alert("updated"))
       .catch((err) => console.log(err));
   };
-
-  
-  
 
   return (
     <Box>
       <Button onClick={() => demo()}>google</Button>
       <Button onClick={() => addData()}>Add</Button>
       <Box>
-        Crousel
+        crousel
       </Box>
     </Box>
   );
 }
-
-
-

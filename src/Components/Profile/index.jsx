@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   AccountCircle,
@@ -25,16 +27,22 @@ import {
 } from "@mui/icons-material";
 import useStyle from "./style";
 import { useFirebase } from "../../Context/Firebase";
+import { updateProfile } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function UserProfile() {
   const classes = useStyle();
   const firebase = useFirebase();
   const [profilePic, setProfilePic] = useState(null);
-  const [imageurl, setImageurl] = useState(firebase.firebaseAuth?.currentUser?.photoURL);
+  const [imageurl, setImageurl] = useState(
+    firebase.firebaseAuth?.currentUser?.photoURL
+  );
   const [userProfile, setUserProfile] = useState(null);
   const [anchorEl1, setAnchorEl1] = useState(null);
   const open1 = Boolean(anchorEl1);
   const [openDialog, setOpenDialog] = useState(false);
+  const [wait, setWait] = useState(false);
+  const [isSnackbarOpen, setIsSnackbarOpen]=useState(false);
 
   const profileCardData = [
     {
@@ -66,26 +74,27 @@ export default function UserProfile() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    firebase.updateProfilePic(profilePic);
-
-    // const imagesRef = ref(
-    //   storage,
-    //   `users/profilePic/${userDisplayName}image.jpg`
-    // );
-    // uploadBytes(imagesRef, profilePic)
-    //   .then((result) => {
-    //     getDownloadURL(ref(storage, result.ref.fullPath)).then((url) => {
-    //       updateProfile(firebaseAuth.currentUser, {
-    //         photoURL: url,
-    //       }).then(()=>{});
-    //     });
-
-    //     const docRef = doc(db, "users", firebaseAuth?.currentUser?.uid);
-    //     updateDoc(docRef, { profilePicPath: result.ref.fullPath })
-    //       .then(() => {})
-    //       .catch(() => console.log("no"));
-    //   })
-    //   .catch((err) => console.log(err));
+    setWait(true);
+    const imagesRef = ref(
+      firebase.storage,
+      `users/profilePic/${firebase.firebaseAuth.currentUser.uid}image.jpg`
+    );
+    uploadBytes(imagesRef, profilePic)
+      .then((result) => {
+        getDownloadURL(ref(firebase.storage, result.ref.fullPath)).then(
+          (url) => {
+            updateProfile(firebase.firebaseAuth.currentUser, {
+              photoURL: url,
+            }).then(() => {
+              setImageurl(url);
+              setIsSnackbarOpen(true);
+              setAnchorEl1(null);
+              setTimeout(() => setWait(false), 1000);
+            });
+          }
+        );
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleClick1 = (event) => {
@@ -146,15 +155,19 @@ export default function UserProfile() {
             <Stack>
               <Box sx={{ position: "relative" }}>
                 <Box className={classes.profilePicBox}>
-                  {imageurl === null ? (
-                    <AccountCircle sx={{ color: " #0000004a", fontSize: 80 }} />
+                  {imageurl === null? (
+                    <AccountCircle sx={{ color: " #0000004a", fontSize: 98 }} />
                   ) : (
                     <Box>
-                      <CardMedia component="img" image={imageurl} />
+                      <CardMedia component="img" image={imageurl}/>
                     </Box>
                   )}
                 </Box>
-                <Typography variant="h6" textTransform="capitalize" textAlign="center">
+                <Typography
+                  variant="h6"
+                  textTransform="capitalize"
+                  textAlign="center"
+                >
                   {userProfile?.role}
                 </Typography>
                 <Typography
@@ -178,29 +191,53 @@ export default function UserProfile() {
                   <Menu
                     id="basic-menu"
                     anchorEl={anchorEl1}
+                    elevation={0}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "center",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "center",
+                    }}
                     open={open1}
                     onClose={handleClose1}
+                    className={classes.menu}
                   >
-                    <Stack
-                      px={1}
-                      gap="10px"
-                      component="form"
-                      onSubmit={handleSubmit}
-                    >
-                      <TextField
-                        type="file"
-                        size="small"
-                        onChange={(e) => setProfilePic(e.target.files[0])}
-                      />
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        sx={{ color: "#f50e31" }}
-                        type="submit"
+                    {!wait ? (
+                      <Stack
+                        px={1}
+                        gap="10px"
+                        component="form"
+                        onSubmit={handleSubmit}
                       >
-                        Change
-                      </Button>
-                    </Stack>
+                        <TextField
+                          type="file"
+                          size="small"
+                          onChange={(e) => setProfilePic(e.target.files[0])}
+                        />
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          sx={{ color: "#f50e31" }}
+                          type="submit"
+                        >
+                          Change
+                        </Button>
+                      </Stack>
+                    ) : (
+                      <Stack
+                        sx={{
+                          width: "300px",
+                          height: "80px",
+                          borderRadius: "8px",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CircularProgress sx={{ color: "#f50e31" }} />
+                      </Stack>
+                    )}
                   </Menu>
                 </Typography>
               </Box>
@@ -308,6 +345,19 @@ export default function UserProfile() {
           </Dialog>
         </Box>
       )}
+      <Snackbar
+     open={isSnackbarOpen}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={3000}
+        onClose={() => setIsSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setIsSnackbarOpen(false)}
+          severity="success"
+          sx={{ width: "100%" }}>
+            Profile Picture Updated Successfully
+          </Alert>
+      </Snackbar>
     </>
   );
 }

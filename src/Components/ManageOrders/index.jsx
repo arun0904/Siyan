@@ -364,7 +364,6 @@ export default function ManageOrders({ ...props }) {
         });
       }
       if (i === length) {
-        console.log(userData);
         setUsers(userData);
       }
     });
@@ -433,6 +432,7 @@ export default function ManageOrders({ ...props }) {
                                 orientation={
                                   mediumViewport ? "vertical" : "horizontal"
                                 }
+                                className={classes.stepperColors}
                               >
                                 {steps.map((item, index) => {
                                   return (
@@ -463,6 +463,12 @@ export default function ManageOrders({ ...props }) {
                                       orderItem.orderId
                                     )
                                   }
+                                  sx={{
+                                    backgroundColor: "black",
+                                    "&:hover": {
+                                      backgroundColor: "black",
+                                    },
+                                  }}
                                 >
                                   Update Step
                                 </Button>

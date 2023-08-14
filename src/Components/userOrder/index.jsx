@@ -275,6 +275,7 @@ export default function UserOrder() {
                         activeStep={handleStepper(item.orderStep)}
                         alternativeLabel={!mediumViewport}
                         orientation={mediumViewport ? "vertical" : "horizontal"}
+                        className={classes.stepperColors}
                       >
                         {steps.map((items, index) => {
                           return (
